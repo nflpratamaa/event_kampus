@@ -5,6 +5,13 @@
 - **Nama**: Naufal Aulia Pratama
 - **NIM**: H1D023046
 
+---
+
+## 🎥 Demo Aplikasi
+![Demo Aplikasi](demo_cpmk_03_H1D023046.gif)
+
+---
+
 ## Deskripsi
 Aplikasi ini dibuat menggunakan Flutter dan GetX untuk menampilkan informasi kegiatan kampus secara praktis. Pengguna dapat melihat daftar event, detail kegiatan, agenda mingguan, informasi panitia, hingga halaman tentang aplikasi. Navigasi dibuat sederhana menggunakan drawer dan seluruh transisi halaman dikontrol melalui GetX sehingga terasa ringan dan responsif.
 
