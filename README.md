@@ -1,88 +1,28 @@
 # Aplikasi Informasi Kegiatan Kampus
 
-**Tugas Pemrograman Mobile A**  
-Nama: Naufal Aulia Pratama  
-NIM: H1D023046  
+## Informasi Pengembang
+- **Mata Kuliah**: Pemrograman Mobile A
+- **Nama**: Naufal Aulia Pratama
+- **NIM**: H1D023046
 
-Implementasi aplikasi informasi kegiatan kampus menggunakan Flutter dan GetX (Paket 6).
+## Deskripsi
+Aplikasi ini dibuat menggunakan Flutter dan GetX untuk menampilkan informasi kegiatan kampus secara praktis. Pengguna dapat melihat daftar event, detail kegiatan, agenda mingguan, informasi panitia, hingga halaman tentang aplikasi. Navigasi dibuat sederhana menggunakan drawer dan seluruh transisi halaman dikontrol melalui GetX sehingga terasa ringan dan responsif.
 
-![Demo Aplikasi](screenshots/demo.gif)
+## Arsitektur Aplikasi
 
-## Fitur
 
-- 📱 Daftar event kampus dengan gambar dan deskripsi
-- 📅 Filter event minggu ini di halaman Agenda
-- 👥 Informasi panitia dan kontak
-- ℹ️ Halaman tentang aplikasi
-- 🎯 Navigasi mudah dengan drawer
-- 💫 Transisi halaman yang smooth dengan GetX
-
-## Struktur Project
-
-```
-lib/
-├── main.dart                 # Entry point aplikasi
-├── app/
-│   ├── routes/              # Konfigurasi routing
-│   │   ├── app_pages.dart   # Definisi halaman
-│   │   └── app_routes.dart  # Konstanta routes
-│   ├── modules/             # Feature modules
-│   │   ├── home/           # Halaman utama
-│   │   ├── detail/         # Detail event
-│   │   ├── agenda/         # Event minggu ini
-│   │   ├── contact/        # Info kontak
-│   │   └── about/          # Tentang aplikasi
-│   └── widgets/            # Widget yang dapat digunakan ulang
-│       └── event_card.dart # Card untuk menampilkan event
-```
-
-## Teknologi
-
-- Flutter & Dart
-- GetX untuk state management & navigasi
-- Assets lokal untuk gambar
-- Material Design
-
-## Implementasi GetX
-
-### 1. Routing dan Navigasi
-GetX menyediakan navigasi yang powerful dan mudah digunakan:
-
-```dart
-// Di app_routes.dart - Definisi nama routes
-class Routes {
-  static const HOME = '/';
-  static const DETAIL = '/detail';
-  static const AGENDA = '/agenda';
-  static const CONTACT = '/contact';
-  static const ABOUT = '/about';
-}
-
-// Di app_pages.dart - Konfigurasi routes dan pages
-class AppPages {
-  static final pages = [
-    GetPage(name: Routes.HOME, page: () => HomePage()),
-    GetPage(name: Routes.DETAIL, page: () => DetailPage()),
-    // ... routes lainnya
-  ];
-}
-
-// Penggunaan navigasi di aplikasi
-Get.toNamed(Routes.DETAIL, arguments: event);  // Navigasi dengan parameter
-Get.back();  // Kembali ke halaman sebelumnya
-```
+### 1. Routing & Navigation
+Routing diatur menggunakan `app_routes.dart` dan `app_pages.dart`. Nama rute seperti `/`, `/detail`, atau `/agenda` disimpan dalam konstanta sehingga mudah digunakan. Untuk berpindah halaman, cukup menggunakan `Get.toNamed(Routes.DETAIL, arguments: event)` dan kembali dengan `Get.back()`.
 
 ### 2. State Management
-GetX memiliki state management reaktif yang powerful:
+State management memanfaatkan GetxController. Misalnya pada `HomeController`, data event disimpan dalam variabel observable (`events.obs`) dan otomatis diperbarui di tampilan menggunakan widget `Obx`. Saat controller dijalankan, fungsi `loadEvents()` memuat daftar event dan langsung ditampilkan tanpa perlu memanggil `setState()`.
 
+#### Contoh Controller
 ```dart
-// Controller dengan observable state
 class HomeController extends GetxController {
-  // Observable variables dengan .obs
   final events = <EventModel>[].obs;
   final isLoading = false.obs;
 
-  // Lifecycle hooks
   @override
   void onInit() {
     super.onInit();
@@ -91,53 +31,24 @@ class HomeController extends GetxController {
 
   void loadEvents() {
     isLoading.value = true;
-    events.assignAll([
-      EventModel(
-        id: '1',
-        title: 'Pekan Kreativitas Mahasiswa',
-        date: DateTime.now(),
-        // ... data lainnya
-      ),
-      // ... events lainnya
-    ]);
+    events.assignAll([...]); // Data event
     isLoading.value = false;
   }
 }
-
-// Penggunaan di UI dengan Obx
-Obx(() => ListView.builder(
-  itemCount: controller.events.length,
-  itemBuilder: (context, index) {
-    final event = controller.events[index];
-    return EventCard(event: event);
-  },
-))
 ```
 
-### 3. Dependency Injection
-GetX menyediakan dependency injection yang simpel:
+### 3. UI Components
+Di bagian tampilan, data ini ditampilkan menggunakan `ListView.builder` dan dibungkus dalam `Obx` agar selalu sinkron dengan data di controller.
 
+Widget utama yang digunakan untuk menampilkan event adalah `EventCard`. Di dalamnya terdapat tampilan gambar, judul, tanggal, dan deskripsi singkat. Widget ini juga menerima fungsi `onTap` untuk membuka halaman detail saat diklik.
+
+#### Contoh Widget
 ```dart
-// Inject controller
-final HomeController controller = Get.put(HomeController());
-
-// Find controller yang sudah di-inject
-final HomeController home = Get.find();
-```
-
-### 4. Custom Widgets
-Widget kustom yang diimplementasikan:
-
-```dart
-// EventCard widget untuk menampilkan event
 class EventCard extends StatelessWidget {
   final EventModel event;
   final VoidCallback? onTap;
 
-  const EventCard({
-    required this.event,
-    this.onTap,
-  });
+  const EventCard({required this.event, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -146,14 +57,7 @@ class EventCard extends StatelessWidget {
         onTap: onTap,
         child: Row(
           children: [
-            // Gambar event
-            Image.asset(
-              event.imageUrl,
-              width: 92,
-              height: 72,
-              fit: BoxFit.cover,
-            ),
-            // Informasi event
+            Image.asset(event.imageUrl, width: 92, height: 72, fit: BoxFit.cover),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,118 +76,19 @@ class EventCard extends StatelessWidget {
 }
 ```
 
-### 5. Fitur per Halaman
+## Fitur Aplikasi
 
-#### Home Page (/)
-- Menampilkan daftar event menggunakan `EventCard`
-- Implementasi drawer untuk navigasi
-- Menggunakan `HomeController` untuk state management
+### 1. Home Page
+Menampilkan seluruh daftar kegiatan dalam bentuk kartu. Ketika salah satu kartu ditekan, pengguna diarahkan ke halaman Detail yang berisi informasi lengkap kegiatan menggunakan data dari `Get.arguments`.
 
-#### Detail Event (/detail)
-- Menerima parameter event melalui `Get.arguments`
-- Menampilkan informasi lengkap event
-- Menggunakan `DetailController`
+### 2. Agenda Page
+Aplikasi secara otomatis menampilkan kegiatan yang berlangsung dalam minggu ini. Logika penyaringan tanggal diatur di dalam controller khusus bernama `AgendaController`.
 
-#### Agenda (/agenda)
-- Filter event minggu ini menggunakan `AgendaController`
-- Sharing state dengan `HomeController` menggunakan Get.find()
+### 3. Contact Page
+Menampilkan daftar panitia lengkap dengan jabatan dan kontak mereka.
 
-#### Contact (/contact)
-- Menampilkan daftar panitia
-- State management dengan `ContactController`
-
-#### About (/about)
-- Informasi aplikasi
-- Menggunakan `AboutController` untuk data statis
-
-### 6. Struktur Project
-Struktur folder mengikuti standar GetX:
-```
-lib/
-├── main.dart                 # GetMaterialApp setup
-├── app/
-│   ├── routes/              # Routing GetX
-│   │   ├── app_pages.dart   # GetPage definitions
-│   │   └── app_routes.dart  # Route names
-│   ├── modules/             # Fitur modules
-│   │   ├── home/           # Home page
-│   │   │   ├── home_page.dart
-│   │   │   └── home_controller.dart
-│   │   └── ... 
-│   └── widgets/            # Shared widgets
-```
-
-```dart
-// Widget card yang dapat digunakan ulang
-class EventCard extends StatelessWidget {
-  final EventModel event;
-  final VoidCallback? onTap;
-  
-  // Tampilan card dengan gambar dan info event
-}
-```
-
-## Cara Menjalankan
-
-1. Clone repository ini
-2. Install dependencies:
-   ```bash
-   flutter pub get
-   ```
-3. Pastikan gambar event tersedia di:
-   ```
-   assets/images/
-   ├── pkm.jpg
-   ├── seminar.jpeg
-   ├── debat.jpg
-   └── workshop.jpeg
-   ```
-4. Jalankan aplikasi:
-   ```bash
-   flutter run
-   ```
-
-## Fitur per Halaman
-
-### Home Page
-- Menampilkan daftar event dalam bentuk card
-- Setiap card berisi gambar, judul, tanggal, dan deskripsi singkat
-- Tap card untuk melihat detail event
-
-### Detail Event
-- Gambar event full width
-- Informasi lengkap event
-- Tombol kembali ke halaman sebelumnya
-
-### Agenda
-- Menampilkan event yang berlangsung minggu ini
-- Menggunakan filter tanggal otomatis
-- Format yang sama dengan halaman Home
-
-### Panitia & Kontak
-- Daftar panitia dengan role
-- Informasi kontak lengkap
-- Layout list yang rapi
-
-### Tentang Aplikasi
-- Informasi versi aplikasi
-- Deskripsi singkat
-- Credit dan informasi pengembang
+### 4. About Page
+Berisi informasi singkat mengenai aplikasi, versi, serta pengembang.
 
 ## Navigasi
-
-Menggunakan drawer (menu samping) yang dapat diakses dari semua halaman utama:
-- Home
-- Agenda Minggu Ini
-- Panitia & Kontak
-- Tentang Aplikasi
-
-## Screenshots
-
-![Home Page](screenshots/home.png)
-![Detail Event](screenshots/detail.png)
-![Agenda](screenshots/agenda.png)
-![Contacts](screenshots/contacts.png)
-
-## Note
-Gambar event disimpan lokal di folder assets/images dengan format .jpg/.jpeg untuk performa optimal.
+Semua halaman utama dapat diakses melalui menu drawer yang ditampilkan di sisi kiri layar, sehingga pengguna dapat berpindah halaman dengan mudah tanpa kembali ke halaman awal.
